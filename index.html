@@ -1,293 +1,368 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <meta charset="UTF-8">
- <title>Babita Ghalley’s Portfolio</title>
- <!-- Google Fonts -->
- <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Slab:wght@700&display=swap" rel="stylesheet">
- <style>
- /* Reset & Body */
- * { box-sizing: border-box; margin: 0; padding: 0; }
- body {
- font-family: 'Roboto', sans-serif;
- background: linear-gradient(135deg, #f6d365, #fda085);
- min-height: 100vh;
- display: flex;
- flex-direction: column;
- color: #222;
- }
+  <meta charset="UTF-8">
+  <title>Babita Ghalley’s Portfolio</title>
 
- /* Header */
- header {
- background: rgba(255,255,255,0.85);
- color: #222;
- padding: 20px 30px;
- font-size: 24px;
- font-weight: bold;
- display: flex;
- align-items: center;
- box-shadow: 0 3px 6px rgba(0,0,0,0.2);
- position: sticky;
- top: 0;
- z-index: 100;
- font-family: 'Roboto Slab', serif;
- border-bottom-left-radius: 12px;
- border-bottom-right-radius: 12px;
- }
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Slab:wght@700&display=swap" rel="stylesheet">
 
- #menuBtn {
- background: #3ec7c1;
- border: none;
- font-size: 24px;
- cursor: pointer;
- margin-right: 20px;
- width: 50px;
- height: 50px;
- display: flex;
- align-items: center;
- justify-content: center;
- border-radius: 8px;
- transition: transform 0.3s, background 0.3s;
- }
- #menuBtn:hover { transform: rotate(90deg); background: #34a9a3; }
+  <style>
+  /* Reset & Body */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #f6d365, #fda085);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: #222;
+  }
 
- /* Grid Tiles */
- #grid {
- display: grid;
- grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
- gap: 20px;
- padding: 30px;
- flex: 1;
- }
- .tile {
- background: #fff;
- border-radius: 12px;
- padding: 40px 20px;
- text-align: center;
- font-size: 20px;
- font-weight: bold;
- cursor: pointer;
- transition: transform 0.3s, box-shadow 0.3s;
- position: relative;
- opacity: 0;
- animation: fadeIn 0.5s forwards;
- }
- .tile:hover {
- transform: scale(1.05) rotate(-1deg);
- box-shadow: 0 10px 20px rgba(0,0,0,0.2);
- }
+  /* Header */
+  header {
+    background: rgba(255,255,255,0.85);
+    color: #222;
+    padding: 20px 30px;
+    font-size: 24px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    font-family: 'Roboto Slab', serif;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
 
- @keyframes fadeIn {
- to { opacity: 1; }
- }
+  #menuBtn {
+    background: #3ec7c1;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    margin-right: 20px;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: transform 0.3s, background 0.3s;
+  }
+  #menuBtn:hover { transform: rotate(90deg); background: #34a9a3; }
 
- .tile-label { font-size: 18px; font-weight: bold; }
- .tile-meta { font-size: 14px; margin-top: 8px; color: #555; }
+  /* Grid Tiles */
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 30px;
+    flex: 1;
+  }
+  .tile {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+  }
+  .tile:hover {
+    transform: scale(1.05) rotate(-1deg);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  }
 
- /* Menu Dropdown */
- #menuDropdown {
- display: none;
- position: absolute;
- top: 70px;
- left: 30px;
- background: #3ec7c1;
- padding: 10px;
- border-radius: 8px;
- z-index: 1000;
- box-shadow: 0 6px 12px rgba(0,0,0,0.2);
- }
- #menuDropdown button {
- display: flex;
- align-items: center;
- gap: 10px;
- background: none;
- border: none;
- font-size: 16px;
- padding: 10px;
- cursor: pointer;
- width: 100%;
- text-align: left;
- border-radius: 6px;
- transition: background 0.2s;
- }
- #menuDropdown button:hover {
- background: rgba(0,0,0,0.1);
- }
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
 
- /* Tooltip */
- .tile[data-meta]:hover::after {
- content: attr(data-meta);
- position: absolute;
- background: rgba(0,0,0,0.8);
- color: #fff;
- padding: 5px 10px;
- border-radius: 6px;
- top: -35px;
- left: 50%;
- transform: translateX(-50%);
- font-size: 12px;
- white-space: nowrap;
- pointer-events: none;
- opacity: 1;
- }
- </style>
+  .tile img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+
+  .tile-label { font-size: 18px; font-weight: bold; }
+  .tile-meta { font-size: 14px; margin-top: 8px; color: #555; }
+
+  /* Menu Dropdown */
+  #menuDropdown {
+    display: none;
+    position: absolute;
+    top: 70px;
+    left: 30px;
+    background: #3ec7c1;
+    padding: 10px;
+    border-radius: 8px;
+    z-index: 1000;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+  }
+  #menuDropdown button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    padding: 10px;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    border-radius: 6px;
+    transition: background 0.2s;
+  }
+  #menuDropdown button:hover {
+    background: rgba(0,0,0,0.1);
+  }
+
+  /* Modal (Preview) */
+  #previewModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+  }
+  #previewModal img, #previewModal iframe {
+    max-width: 90%;
+    max-height: 80%;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(255,255,255,0.3);
+  }
+  #closePreview {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 32px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  </style>
 </head>
 <body>
 
- <header>
- <button id="menuBtn">☰</button>
- <span id="headerTitle">Welcome to Babita Ghalley’s Portfolio</span>
- </header>
+  <header>
+    <button id="menuBtn">☰</button>
+    <span id="headerTitle">Welcome to Babita Ghalley’s Portfolio</span>
+  </header>
 
- <div id="menuDropdown">
- <button id="newFolderBtn">📁 New Folder</button>
- <button id="fileUploadBtn">📤 File Upload</button>
- <button id="folderUploadBtn">📂 Folder Upload</button>
- </div>
+  <div id="menuDropdown">
+    <button id="newFolderBtn">📁 New Folder</button>
+    <button id="fileUploadBtn">📤 File Upload</button>
+    <button id="folderUploadBtn">📂 Folder Upload</button>
+  </div>
 
- <input type="file" id="fileInput" multiple style="display:none;">
- <input type="file" id="folderInput" webkitdirectory directory multiple style="display:none;">
+  <input type="file" id="fileInput" multiple style="display:none;">
+  <input type="file" id="folderInput" webkitdirectory directory multiple style="display:none;">
 
- <div id="grid"></div>
+  <div id="grid"></div>
 
- <script>
- (function(){
- const colors = ["#ffd6e0","#c3f0ca","#a0c4ff","#ffc6ff","#fffffc","#faffd1","#c1e1c1"];
- let colorIndex = 0;
+  <!-- Modal for preview -->
+  <div id="previewModal">
+    <span id="closePreview">&times;</span>
+    <img id="previewImg" src="" alt="" style="display:none;">
+    <iframe id="previewFile" style="display:none;" frameborder="0"></iframe>
+  </div>
 
- const grid = document.getElementById('grid');
- const header = document.getElementById('headerTitle');
- const menuBtn = document.getElementById('menuBtn');
- const menu = document.getElementById('menuDropdown');
- const fileInput = document.getElementById('fileInput');
- const folderInput = document.getElementById('folderInput');
+  <script>
+  (function(){
+    const colors = ["#ffd6e0","#c3f0ca","#a0c4ff","#ffc6ff","#fffffc","#faffd1","#c1e1c1"];
+    let colorIndex = 0;
 
- // Track current path
- let root = { name: "Welcome to Babita Ghalley’s Portfolio", children: [], parent: null };
- let current = root;
+    const grid = document.getElementById('grid');
+    const header = document.getElementById('headerTitle');
+    const menuBtn = document.getElementById('menuBtn');
+    const menu = document.getElementById('menuDropdown');
+    const fileInput = document.getElementById('fileInput');
+    const folderInput = document.getElementById('folderInput');
 
- function createTile(item){
- const tile = document.createElement('div');
- tile.className = 'tile';
- tile.style.background = colors[colorIndex % colors.length];
- colorIndex++;
+    const previewModal = document.getElementById('previewModal');
+    const previewImg = document.getElementById('previewImg');
+    const previewFile = document.getElementById('previewFile');
+    const closePreview = document.getElementById('closePreview');
 
- const label = document.createElement('div');
- label.className = 'tile-label';
- label.textContent = item.isFile ? "📄 " + item.name : "📁 " + item.name;
- tile.appendChild(label);
+    let root = { name: "Welcome to Babita Ghalley’s Portfolio", children: [], parent: null };
+    let current = root;
 
- if(item.meta){
- const meta = document.createElement('div');
- meta.className = 'tile-meta';
- meta.textContent = item.meta;
- tile.appendChild(meta);
- }
+    // Create a tile (folder or file)
+    function createTile(item){
+      const tile = document.createElement('div');
+      tile.className = 'tile';
+      tile.style.background = colors[colorIndex % colors.length];
+      colorIndex++;
 
- if(item.meta) tile.setAttribute('data-meta', item.meta);
+      const label = document.createElement('div');
+      label.className = 'tile-label';
+      label.textContent = item.isFile ? "📄 " + item.name : "📁 " + item.name;
+      tile.appendChild(label);
 
- // Folder navigation
- if(!item.isFile){
- tile.addEventListener('click', () => {
- current = item;
- render();
- });
- }
+      if(item.meta){
+        const meta = document.createElement('div');
+        meta.className = 'tile-meta';
+        meta.textContent = item.meta;
+        tile.appendChild(meta);
+      }
 
- grid.appendChild(tile);
- }
+      if(item.isFile && item.url && item.name.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i)){
+        const img = document.createElement('img');
+        img.src = item.url;
+        img.alt = item.name;
+        tile.appendChild(img);
+      }
 
- function render(){
- grid.innerHTML = '';
- header.textContent = current.name;
+      // Behavior when clicked
+      if(item.isFile){
+        tile.addEventListener('click', () => openPreview(item));
+      } else {
+        tile.addEventListener('click', () => { current = item; render(); });
+      }
 
- if(current.parent){
- const back = document.createElement('div');
- back.className = 'tile';
- back.style.background = '#999';
- back.innerHTML = "<div class='tile-label'>⬅ Back</div>";
- back.addEventListener('click', ()=>{
- current = current.parent;
- render();
- });
- grid.appendChild(back);
- }
+      grid.appendChild(tile);
+    }
 
- current.children.forEach(c => createTile(c));
- }
+    // Show folder view
+    function render(){
+      grid.innerHTML = '';
+      header.textContent = current.name;
 
- function addFolder(name){
- const folder = { name, children: [], parent: current };
- current.children.push(folder);
- render();
- }
+      if(current.parent){
+        const back = document.createElement('div');
+        back.className = 'tile';
+        back.style.background = '#999';
+        back.innerHTML = "<div class='tile-label'>⬅ Back</div>";
+        back.addEventListener('click', ()=>{
+          current = current.parent;
+          render();
+        });
+        grid.appendChild(back);
+      }
 
- function addFile(file){
- const f = { name: file.name, isFile:true, meta: humanFileSize(file.size), parent: current };
- current.children.push(f);
- render();
- }
+      current.children.forEach(c => createTile(c));
+    }
 
- // Menu toggle
- function openMenu(){ menu.style.display='block'; }
- function closeMenu(){ menu.style.display='none'; }
- function toggleMenu(e){ e.stopPropagation(); menu.style.display==='block'?closeMenu():openMenu(); }
- menuBtn.addEventListener('click', toggleMenu);
+    // Add new folder
+    function addFolder(name){
+      const folder = { name, children: [], parent: current };
+      current.children.push(folder);
+      render();
+    }
 
- document.getElementById('newFolderBtn').addEventListener('click', () => {
- const name = prompt("Folder name:", "New Folder");
- if(name && name.trim()){ addFolder(name.trim()); closeMenu(); }
- });
+    // Add uploaded file
+    function addFile(file){
+      const url = URL.createObjectURL(file);
+      const f = { 
+        name: file.name, 
+        isFile: true, 
+        meta: humanFileSize(file.size), 
+        parent: current,
+        url 
+      };
+      current.children.push(f);
+      render();
+    }
 
- document.getElementById('fileUploadBtn').addEventListener('click', () => {
- fileInput.value = null; fileInput.click();
- });
- fileInput.addEventListener('change', (ev) => {
- const files = ev.target.files;
- if(!files || files.length === 0) return;
- for(const f of files){ addFile(f); }
- closeMenu();
- });
+    // Preview modal
+    function openPreview(item){
+      previewModal.style.display = 'flex';
+      if(item.name.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i)){
+        previewImg.src = item.url;
+        previewImg.style.display = 'block';
+        previewFile.style.display = 'none';
+      } else {
+        previewImg.style.display = 'none';
+        previewFile.style.display = 'block';
+        previewFile.src = item.url;
+      }
+    }
+    closePreview.addEventListener('click', () => {
+      previewModal.style.display = 'none';
+      previewImg.src = '';
+      previewFile.src = '';
+    });
+    window.addEventListener('click', (e) => {
+      if(e.target === previewModal){ closePreview.click(); }
+    });
 
- document.getElementById('folderUploadBtn').addEventListener('click', () => {
- folderInput.value = null; folderInput.click();
- });
- folderInput.addEventListener('change', (ev) => {
- const files = Array.from(ev.target.files || []);
- if(files.length === 0) return;
- const rootMap = new Map();
- files.forEach(f => {
- const rel = f.webkitRelativePath || f.name;
- const root = rel.includes('/') ? rel.split('/')[0] : rel;
- const arr = rootMap.get(root) || [];
- arr.push(f);
- rootMap.set(root, arr);
- });
- rootMap.forEach((arr, rootName) => {
- const folder = { name: rootName, children: [], parent: current };
- arr.forEach(file => folder.children.push({name:file.name, isFile:true, meta:humanFileSize(file.size), parent:folder}));
- current.children.push(folder);
- });
- render();
- closeMenu();
- });
+    // Menu functions
+    function openMenu(){ menu.style.display='block'; }
+    function closeMenu(){ menu.style.display='none'; }
+    function toggleMenu(e){ e.stopPropagation(); menu.style.display==='block'?closeMenu():openMenu(); }
+    menuBtn.addEventListener('click', toggleMenu);
 
- function humanFileSize(size){
- if(size===0) return "0 B";
- const i = Math.floor(Math.log(size) / Math.log(1024));
- const sizes = ['B','KB','MB','GB','TB'];
- return (size / Math.pow(1024, i)).toFixed((i===0)?0:1) + ' ' + sizes[i];
- }
+    document.getElementById('newFolderBtn').addEventListener('click', () => {
+      const name = prompt("Folder name:", "New Folder");
+      if(name && name.trim()){ addFolder(name.trim()); closeMenu(); }
+    });
 
- // Close menu on outside click / ESC
- window.addEventListener('click', (e) => {
- if(!menu.contains(e.target) && e.target !== menuBtn && !menuBtn.contains(e.target)){ closeMenu(); }
- });
- window.addEventListener('keydown',(e)=>{ if(e.key==="Escape") closeMenu(); });
+    document.getElementById('fileUploadBtn').addEventListener('click', () => {
+      fileInput.value = null; fileInput.click();
+    });
+    fileInput.addEventListener('change', (ev) => {
+      const files = ev.target.files;
+      if(!files || files.length === 0) return;
+      for(const f of files){ addFile(f); }
+      closeMenu();
+    });
 
- // Initial folders
- ["Year 2021","Year 2022","Year 2023","Year 2024","Year 2025","Year 2026"].forEach(n => addFolder(n));
- })();
- </script>
+    document.getElementById('folderUploadBtn').addEventListener('click', () => {
+      folderInput.value = null; folderInput.click();
+    });
+    folderInput.addEventListener('change', (ev) => {
+      const files = Array.from(ev.target.files || []);
+      if(files.length === 0) return;
+      const rootMap = new Map();
+      files.forEach(f => {
+        const rel = f.webkitRelativePath || f.name;
+        const root = rel.includes('/') ? rel.split('/')[0] : rel;
+        const arr = rootMap.get(root) || [];
+        arr.push(f);
+        rootMap.set(root, arr);
+      });
+      rootMap.forEach((arr, rootName) => {
+        const folder = { name: rootName, children: [], parent: current };
+        arr.forEach(file => folder.children.push({
+          name:file.name,
+          isFile:true,
+          meta:humanFileSize(file.size),
+          parent:folder,
+          url: URL.createObjectURL(file)
+        }));
+        current.children.push(folder);
+      });
+      render();
+      closeMenu();
+    });
+
+    function humanFileSize(size){
+      if(size===0) return "0 B";
+      const i = Math.floor(Math.log(size) / Math.log(1024));
+      const sizes = ['B','KB','MB','GB','TB'];
+      return (size / Math.pow(1024, i)).toFixed((i===0)?0:1) + ' ' + sizes[i];
+    }
+
+    window.addEventListener('click', (e) => {
+      if(!menu.contains(e.target) && e.target !== menuBtn && !menuBtn.contains(e.target)){ closeMenu(); }
+    });
+    window.addEventListener('keydown',(e)=>{ if(e.key==="Escape") closeMenu(); });
+
+    // Initial folders
+    ["Year 2021","Year 2022","Year 2023","Year 2024","Year 2025","Year 2026"].forEach(n => addFolder(n));
+  })();
+  </script>
 </body>
 </html>
