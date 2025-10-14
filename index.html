@@ -260,45 +260,34 @@ header{
  <iframe id="previewFile" style="display:none;" frameborder="0"></iframe>
 </div>
 
-<!-- Firebase SDKs -->
+<!-- Firebase -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getStorage, ref, uploadBytes, getDownloadURL, listAll } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.24.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.24.0/firebase-analytics.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.24.0/firebase-storage.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyA1CadaPw5ge4zrbllo7o4VTMwu2Xd-vw0",
-    authDomain: "folder-86dc1.firebaseapp.com",
-    projectId: "folder-86dc1",
-    storageBucket: "folder-86dc1.appspot.com",
-    messagingSenderId: "253312968549",
-    appId: "1:253312968549:web:bd08448e639206e621638c",
-    measurementId: "G-CKZYJJPDM3"
-  };
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyA1CadaPw5ge4zrbllo7o4VTMwu2Xd-vw0",
+  authDomain: "folder-86dc1.firebaseapp.com",
+  projectId: "folder-86dc1",
+  storageBucket: "folder-86dc1.appspot.com",
+  messagingSenderId: "253312968549",
+  appId: "1:253312968549:web:bd08448e639206e621638c",
+  measurementId: "G-CKZYJJPDM3"
+};
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const storage = getStorage(app);
 
-  const app = initializeApp(firebaseConfig);
-  const storage = getStorage(app);
-
-  // Function to upload file to Firebase and return download URL
-  async function uploadFileToFirebase(file, folderPath="") {
-    const storageRef = ref(storage, folderPath + file.name);
+// Helper to upload file and return URL
+window.firebaseStorage = {
+  async uploadFileToFirebase(file, path="") {
+    const storageRef = ref(storage, path + file.name);
     await uploadBytes(storageRef, file);
-    const url = await getDownloadURL(storageRef);
-    return url;
+    return await getDownloadURL(storageRef);
   }
-
-  // Function to list all files from Firebase root folder
-  async function loadFilesFromFirebase(parentFolder) {
-    const listRef = ref(storage, parentFolder ? parentFolder.name + "/" : "");
-    const res = await listAll(listRef);
-    const files = [];
-    for (const itemRef of res.items) {
-      const url = await getDownloadURL(itemRef);
-      files.push({ name: itemRef.name, isFile:true, url, parent:parentFolder });
-    }
-    return files;
-  }
-
-  window.firebaseStorage = { uploadFileToFirebase, loadFilesFromFirebase };
+};
 </script>
 
 <script>
@@ -339,7 +328,7 @@ function drawStars(){
    if(s.x>W) s.x=0; if(s.x<0) s.x=W;
    if(s.y>H) s.y=0; if(s.y<0) s.y=H;
  }
-
+ // Shooting stars
  for(let i=shootingStars.length-1;i>=0;i--){
    const s = shootingStars[i];
    ctx.beginPath();
@@ -351,19 +340,23 @@ function drawStars(){
    s.x += s.vx*s.speed;
    s.y += s.vy*s.speed;
    s.alpha -= 0.02;
-   if(s.alpha<=0 || s.x>W || s.y>H){
-     shootingStars.splice(i,1);
-   }
+   if(s.alpha<=0 || s.x>W || s.y>H){ shootingStars.splice(i,1); }
  }
-
  requestAnimationFrame(drawStars);
 }
 function spawnShootingStar(){
- const s = { x: Math.random()*W*0.5, y: Math.random()*H*0.5, vx: Math.random()*2+1, vy: Math.random()*2+1, speed: Math.random()*5+3, length: Math.random()*80+50, alpha:1 };
+ const s = {
+   x: Math.random()*W*0.5,
+   y: Math.random()*H*0.5,
+   vx: Math.random()*2+1,
+   vy: Math.random()*2+1,
+   speed: Math.random()*5+3,
+   length: Math.random()*80+50,
+   alpha:1
+ };
  shootingStars.push(s);
  setTimeout(spawnShootingStar, Math.random()*3000+2000);
 }
-
 window.addEventListener('resize',()=>{
  W=canvas.width=window.innerWidth;
  H=canvas.height=window.innerHeight;
@@ -373,7 +366,7 @@ initStars();
 drawStars();
 spawnShootingStar();
 
-// ----- Portfolio Functionality -----
+// ----- Portfolio Functionality + Firebase Storage -----
 (function(){
 const colors=["#ffd6e0","#c3f0ca","#a0c4ff","#ffc6ff","#fffffc","#faffd1","#c1e1c1"];
 let colorIndex=0;
@@ -393,7 +386,6 @@ const previewModal=document.getElementById('previewModal');
 const previewImg=document.getElementById('previewImg');
 const previewFile=document.getElementById('previewFile');
 const closePreview=document.getElementById('closePreview');
-
 let root={name:"Welcome to Babita Ghalley’s Portfolio",children:[],parent:null};
 let current=root;
 let selectedItem=null;
@@ -447,40 +439,55 @@ path.forEach((folder,idx)=>{
 });
 }
 function addFolder(name){ const folder={name,children:[],parent:current}; current.children.push(folder); render(); }
+
 async function addFile(file){
   const url = await window.firebaseStorage.uploadFileToFirebase(file, current.name + "/");
   current.children.push({name:file.name,isFile:true,meta:humanFileSize(file.size),parent:current,url});
   render();
 }
+
 function humanFileSize(size){ if(size===0)return"0 B"; const i=Math.floor(Math.log(size)/Math.log(1024)); const sizes=['B','KB','MB','GB','TB']; return (size/Math.pow(1024,i)).toFixed((i===0)?0:1)+' '+sizes[i]; }
+
 function openPreview(item){ previewModal.style.display='flex'; if(item.name.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i)){ previewImg.src=item.url; previewImg.style.display='block'; previewFile.style.display='none'; }else{ previewFile.src=item.url; previewFile.style.display='block'; previewImg.style.display='none'; } previewModal.dataset.currentUrl=item.url; }
 function closePreviewModal(){ previewModal.style.display='none'; if(previewModal.dataset.currentUrl)URL.revokeObjectURL(previewModal.dataset.currentUrl); previewImg.src=''; previewFile.src=''; previewModal.dataset.currentUrl=''; }
 closePreview.addEventListener('click',closePreviewModal);
 window.addEventListener('click',e=>{if(e.target===previewModal)closePreviewModal();});
 window.addEventListener('keydown',e=>{if(e.key==='Escape')closePreviewModal();});
-
 function toggleMenu(e){ e.stopPropagation(); menu.style.display=(menu.style.display==='block')?'none':'block'; }
 menuBtn.addEventListener('click',toggleMenu);
-
 document.getElementById('newFolderBtn').addEventListener('click',()=>{ const name=prompt("Folder name:","New Folder"); if(name&&name.trim()){addFolder(name.trim());menu.style.display='none';} });
-document.getElementById('fileUploadBtn').addEventListener('click',()=>{ fileInput.value=null; fileInput.click(); });
-fileInput.addEventListener('change',e=>{ Array.from(e.target.files).forEach(addFile); menu.style.display='none'; });
-document.getElementById('folderUploadBtn').addEventListener('click',()=>{ folderInput.value=null; folderInput.click(); });
-folderInput.addEventListener('change',e=>handleFolderUpload(e.target.files));
 
-function handleFolderUpload(files){ 
-  const arr=Array.from(files||[]); if(arr.length===0)return; 
+document.getElementById('fileUploadBtn').addEventListener('click',()=>{ fileInput.value=null; fileInput.click(); });
+fileInput.addEventListener('change', async e=>{ 
+  menu.style.display='none'; 
+  const files = Array.from(e.target.files);
+  for(const file of files) await addFile(file);
+});
+
+document.getElementById('folderUploadBtn').addEventListener('click',()=>{ folderInput.value=null; folderInput.click(); });
+folderInput.addEventListener('change', async e=>{ 
+  menu.style.display='none'; 
+  await handleFolderUpload(e.target.files);
+});
+
+async function handleFolderUpload(files){ 
+  const arr=Array.from(files||[]); 
+  if(arr.length===0) return; 
   const rootMap=new Map(); 
-  arr.forEach(f=>{ const rel=f.webkitRelativePath||f.name; const root=rel.includes('/')?rel.split('/')[0]:rel; const list=rootMap.get(root)||[]; list.push(f);rootMap.set(root,list); }); 
-  rootMap.forEach((list,rootName)=>{
+  arr.forEach(f=>{
+    const rel=f.webkitRelativePath||f.name; 
+    const root=rel.includes('/')?rel.split('/')[0]:rel; 
+    const list=rootMap.get(root)||[]; list.push(f); rootMap.set(root,list);
+  });
+  for(const [rootName,list] of rootMap){
     const folder={name:rootName,children:[],parent:current};
-    list.forEach(async f=>{
-      const url = await window.firebaseStorage.uploadFileToFirebase(f, current.name + "/" + rootName + "/");
+    for(const f of list){
+      const url=await window.firebaseStorage.uploadFileToFirebase(f, current.name + "/" + rootName + "/");
       folder.children.push({name:f.name,isFile:true,meta:humanFileSize(f.size),parent:folder,url});
-    });
+    }
     current.children.push(folder);
-  }); 
-  render(); menu.style.display='none'; 
+  }
+  render();
 }
 
 searchBar.addEventListener('input',()=>{ clearSearch.style.display=searchBar.value?'block':'none'; render(); });
@@ -489,9 +496,7 @@ window.addEventListener('click',e=>{ if(!menu.contains(e.target)&&!menuBtn.conta
 window.addEventListener('keydown',e=>{ if(e.key==='Escape'){ menu.style.display='none'; contextMenu.style.display='none'; } });
 renameBtn.addEventListener('click',()=>{ if(selectedItem){ const name=prompt("Rename:",selectedItem.name); if(name&&name.trim()){selectedItem.name=name.trim();render();} contextMenu.style.display='none'; } });
 deleteBtn.addEventListener('click',()=>{ if(selectedItem&&selectedItem.parent){ selectedItem.parent.children=selectedItem.parent.children.filter(c=>c!==selectedItem); selectedItem=null;render();contextMenu.style.display='none'; } });
-
 ["Year 2021","Year 2022","Year 2023","Year 2024","Year 2025","Year 2026"].forEach(addFolder);
-
 })();
 </script>
 </body>
