@@ -260,7 +260,6 @@ header{
  <iframe id="previewFile" style="display:none;" frameborder="0"></iframe>
 </div>
 
-<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.24.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.24.0/firebase-analytics.js";
@@ -271,7 +270,8 @@ const firebaseConfig = {
   apiKey: "AIzaSyA1CadaPw5ge4zrbllo7o4VTMwu2Xd-vw0",
   authDomain: "folder-86dc1.firebaseapp.com",
   projectId: "folder-86dc1",
-  storageBucket: "folder-86dc1.appspot.com",
+  // ⭐️ FIX IS HERE: changed .firebasestorage.app to .appspot.com
+  storageBucket: "folder-86dc1.appspot.com", 
   messagingSenderId: "253312968549",
   appId: "1:253312968549:web:bd08448e639206e621638c",
   measurementId: "G-CKZYJJPDM3"
