@@ -18,7 +18,6 @@ body{
  overflow-x: hidden;
 }
 
-
 /* Dynamic Starry Background */
 canvas#stars {
  position: fixed;
@@ -29,7 +28,6 @@ canvas#stars {
  z-index:0;
  pointer-events:none;
 }
-
 
 /* Header */
 header{
@@ -72,7 +70,6 @@ header{
 }
 #headerTitle{flex:1;text-align:center}
 
-
 /* Search Bar + Clear Button */
 .search-container{position:relative;display:flex;align-items:center;}
 #searchBar{
@@ -99,7 +96,6 @@ header{
  border:none;
 }
 
-
 /* Breadcrumb */
 #breadcrumb{
  background:rgba(255,255,255,0.75);
@@ -119,7 +115,6 @@ header{
 }
 #breadcrumb span:hover{text-decoration:underline;}
 #breadcrumb .divider{color:#333;}
-
 
 /* Grid */
 #grid{
@@ -162,7 +157,6 @@ header{
 .tile-label{font-size:16px;font-weight:bold;}
 .tile-meta{font-size:12px;margin-top:6px;color:#555;}
 
-
 /* Menus */
 #menuDropdown,#contextMenu{
  display:none;
@@ -192,7 +186,6 @@ header{
  transform: scale(1.02);
 }
 
-
 /* Preview Modal */
 #previewModal{
  display:none;
@@ -220,9 +213,7 @@ header{
  font-weight:bold;
 }
 
-
 #grid.dragover{background:rgba(0,0,0,0.05);}
-
 
 @media (max-width:600px){
  header{font-size:18px;padding:12px 15px;flex-direction:column;}
@@ -234,9 +225,7 @@ header{
 </head>
 <body>
 
-
 <canvas id="stars"></canvas>
-
 
 <header>
  <button id="menuBtn" aria-label="Menu">☰</button>
@@ -247,9 +236,7 @@ header{
  </div>
 </header>
 
-
 <div id="breadcrumb"></div>
-
 
 <div id="menuDropdown">
  <button id="newFolderBtn">📁 New Folder</button>
@@ -257,19 +244,15 @@ header{
  <button id="folderUploadBtn">📂 Folder Upload</button>
 </div>
 
-
 <div id="contextMenu">
  <button id="renameBtn">✏️ Rename</button>
  <button id="deleteBtn">🗑 Delete</button>
 </div>
 
-
 <input type="file" id="fileInput" multiple style="display:none;">
 <input type="file" id="folderInput" webkitdirectory directory multiple style="display:none;">
 
-
 <div id="grid"></div>
-
 
 <div id="previewModal">
  <span id="closePreview" aria-label="Close Preview">&times;</span>
@@ -277,6 +260,46 @@ header{
  <iframe id="previewFile" style="display:none;" frameborder="0"></iframe>
 </div>
 
+<!-- Firebase SDKs -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL, listAll } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA1CadaPw5ge4zrbllo7o4VTMwu2Xd-vw0",
+    authDomain: "folder-86dc1.firebaseapp.com",
+    projectId: "folder-86dc1",
+    storageBucket: "folder-86dc1.appspot.com",
+    messagingSenderId: "253312968549",
+    appId: "1:253312968549:web:bd08448e639206e621638c",
+    measurementId: "G-CKZYJJPDM3"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const storage = getStorage(app);
+
+  // Function to upload file to Firebase and return download URL
+  async function uploadFileToFirebase(file, folderPath="") {
+    const storageRef = ref(storage, folderPath + file.name);
+    await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(storageRef);
+    return url;
+  }
+
+  // Function to list all files from Firebase root folder
+  async function loadFilesFromFirebase(parentFolder) {
+    const listRef = ref(storage, parentFolder ? parentFolder.name + "/" : "");
+    const res = await listAll(listRef);
+    const files = [];
+    for (const itemRef of res.items) {
+      const url = await getDownloadURL(itemRef);
+      files.push({ name: itemRef.name, isFile:true, url, parent:parentFolder });
+    }
+    return files;
+  }
+
+  window.firebaseStorage = { uploadFileToFirebase, loadFilesFromFirebase };
+</script>
 
 <script>
 // ----- Animated Star Background + Shooting Stars -----
@@ -287,7 +310,6 @@ let H = canvas.height = window.innerHeight;
 let stars = [];
 const STAR_COUNT = 150;
 let shootingStars = [];
-
 
 function initStars(){
  stars=[];
@@ -318,8 +340,6 @@ function drawStars(){
    if(s.y>H) s.y=0; if(s.y<0) s.y=H;
  }
 
-
- // Draw shooting stars
  for(let i=shootingStars.length-1;i>=0;i--){
    const s = shootingStars[i];
    ctx.beginPath();
@@ -336,26 +356,13 @@ function drawStars(){
    }
  }
 
-
  requestAnimationFrame(drawStars);
 }
-
-
-// Randomly spawn shooting stars
 function spawnShootingStar(){
- const s = {
-   x: Math.random()*W*0.5,
-   y: Math.random()*H*0.5,
-   vx: Math.random()*2+1,
-   vy: Math.random()*2+1,
-   speed: Math.random()*5+3,
-   length: Math.random()*80+50,
-   alpha:1
- };
+ const s = { x: Math.random()*W*0.5, y: Math.random()*H*0.5, vx: Math.random()*2+1, vy: Math.random()*2+1, speed: Math.random()*5+3, length: Math.random()*80+50, alpha:1 };
  shootingStars.push(s);
- setTimeout(spawnShootingStar, Math.random()*3000+2000); // every 2-5s
+ setTimeout(spawnShootingStar, Math.random()*3000+2000);
 }
-
 
 window.addEventListener('resize',()=>{
  W=canvas.width=window.innerWidth;
@@ -366,8 +373,7 @@ initStars();
 drawStars();
 spawnShootingStar();
 
-
-// ----- Portfolio Functionality (unchanged) -----
+// ----- Portfolio Functionality -----
 (function(){
 const colors=["#ffd6e0","#c3f0ca","#a0c4ff","#ffc6ff","#fffffc","#faffd1","#c1e1c1"];
 let colorIndex=0;
@@ -387,10 +393,10 @@ const previewModal=document.getElementById('previewModal');
 const previewImg=document.getElementById('previewImg');
 const previewFile=document.getElementById('previewFile');
 const closePreview=document.getElementById('closePreview');
+
 let root={name:"Welcome to Babita Ghalley’s Portfolio",children:[],parent:null};
 let current=root;
 let selectedItem=null;
-
 
 function createTile(item){
 const tile=document.createElement('div'); tile.className='tile'; tile.tabIndex=0;
@@ -413,7 +419,6 @@ tile.addEventListener('contextmenu',e=>{
 });
 grid.appendChild(tile);
 }
-
 
 function navigateFolder(folder){current=folder;render();}
 function render(){
@@ -442,32 +447,52 @@ path.forEach((folder,idx)=>{
 });
 }
 function addFolder(name){ const folder={name,children:[],parent:current}; current.children.push(folder); render(); }
-function addFile(file){ const url=URL.createObjectURL(file); current.children.push({name:file.name,isFile:true,meta:humanFileSize(file.size),parent:current,url}); render(); }
+async function addFile(file){
+  const url = await window.firebaseStorage.uploadFileToFirebase(file, current.name + "/");
+  current.children.push({name:file.name,isFile:true,meta:humanFileSize(file.size),parent:current,url});
+  render();
+}
 function humanFileSize(size){ if(size===0)return"0 B"; const i=Math.floor(Math.log(size)/Math.log(1024)); const sizes=['B','KB','MB','GB','TB']; return (size/Math.pow(1024,i)).toFixed((i===0)?0:1)+' '+sizes[i]; }
 function openPreview(item){ previewModal.style.display='flex'; if(item.name.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i)){ previewImg.src=item.url; previewImg.style.display='block'; previewFile.style.display='none'; }else{ previewFile.src=item.url; previewFile.style.display='block'; previewImg.style.display='none'; } previewModal.dataset.currentUrl=item.url; }
 function closePreviewModal(){ previewModal.style.display='none'; if(previewModal.dataset.currentUrl)URL.revokeObjectURL(previewModal.dataset.currentUrl); previewImg.src=''; previewFile.src=''; previewModal.dataset.currentUrl=''; }
 closePreview.addEventListener('click',closePreviewModal);
 window.addEventListener('click',e=>{if(e.target===previewModal)closePreviewModal();});
 window.addEventListener('keydown',e=>{if(e.key==='Escape')closePreviewModal();});
+
 function toggleMenu(e){ e.stopPropagation(); menu.style.display=(menu.style.display==='block')?'none':'block'; }
 menuBtn.addEventListener('click',toggleMenu);
+
 document.getElementById('newFolderBtn').addEventListener('click',()=>{ const name=prompt("Folder name:","New Folder"); if(name&&name.trim()){addFolder(name.trim());menu.style.display='none';} });
 document.getElementById('fileUploadBtn').addEventListener('click',()=>{ fileInput.value=null; fileInput.click(); });
 fileInput.addEventListener('change',e=>{ Array.from(e.target.files).forEach(addFile); menu.style.display='none'; });
 document.getElementById('folderUploadBtn').addEventListener('click',()=>{ folderInput.value=null; folderInput.click(); });
 folderInput.addEventListener('change',e=>handleFolderUpload(e.target.files));
-function handleFolderUpload(files){ const arr=Array.from(files||[]); if(arr.length===0)return; const rootMap=new Map(); arr.forEach(f=>{ const rel=f.webkitRelativePath||f.name; const root=rel.includes('/')?rel.split('/')[0]:rel; const list=rootMap.get(root)||[]; list.push(f);rootMap.set(root,list); }); rootMap.forEach((list,rootName)=>{ const folder={name:rootName,children:[],parent:current}; list.forEach(f=>{ folder.children.push({name:f.name,isFile:true,meta:humanFileSize(f.size),parent:folder,url:URL.createObjectURL(f)}); }); current.children.push(folder); }); render(); menu.style.display='none'; }
+
+function handleFolderUpload(files){ 
+  const arr=Array.from(files||[]); if(arr.length===0)return; 
+  const rootMap=new Map(); 
+  arr.forEach(f=>{ const rel=f.webkitRelativePath||f.name; const root=rel.includes('/')?rel.split('/')[0]:rel; const list=rootMap.get(root)||[]; list.push(f);rootMap.set(root,list); }); 
+  rootMap.forEach((list,rootName)=>{
+    const folder={name:rootName,children:[],parent:current};
+    list.forEach(async f=>{
+      const url = await window.firebaseStorage.uploadFileToFirebase(f, current.name + "/" + rootName + "/");
+      folder.children.push({name:f.name,isFile:true,meta:humanFileSize(f.size),parent:folder,url});
+    });
+    current.children.push(folder);
+  }); 
+  render(); menu.style.display='none'; 
+}
+
 searchBar.addEventListener('input',()=>{ clearSearch.style.display=searchBar.value?'block':'none'; render(); });
 clearSearch.addEventListener('click',()=>{ searchBar.value='';clearSearch.style.display='none';render(); });
 window.addEventListener('click',e=>{ if(!menu.contains(e.target)&&!menuBtn.contains(e.target)&&!contextMenu.contains(e.target)){ menu.style.display='none'; contextMenu.style.display='none'; } });
 window.addEventListener('keydown',e=>{ if(e.key==='Escape'){ menu.style.display='none'; contextMenu.style.display='none'; } });
 renameBtn.addEventListener('click',()=>{ if(selectedItem){ const name=prompt("Rename:",selectedItem.name); if(name&&name.trim()){selectedItem.name=name.trim();render();} contextMenu.style.display='none'; } });
 deleteBtn.addEventListener('click',()=>{ if(selectedItem&&selectedItem.parent){ selectedItem.parent.children=selectedItem.parent.children.filter(c=>c!==selectedItem); selectedItem=null;render();contextMenu.style.display='none'; } });
+
 ["Year 2021","Year 2022","Year 2023","Year 2024","Year 2025","Year 2026"].forEach(addFolder);
+
 })();
 </script>
 </body>
 </html>
-
-
-
